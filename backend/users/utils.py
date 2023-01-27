@@ -5,38 +5,17 @@ import binascii
 import smtplib
 import random
 from django.utils.crypto import get_random_string
-
-
-
-
-
-# def generate_random_code():
-#     return 'school_name'.join(random.choice(string.ascii_lowercase + string.digits, k=4))
-RANDOM_STRING_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-# def generate_user_id(length,account_type, allowed_chars="1234567890"):
-#     result = None
-#     if account_type == "teacher":
-#         result = "tch"
-#     if account_type == "student":
-#         result = "stud"
-#     if account_type == "parent":
-#         result = "prt"
-    
-#     return (f"{result}{get_random_string(length, allowed_chars)}")
-
-def generate_random_number():
-    return str(random.randint(1000, 9999))
+from .models import *
 
 
 def generate_username(role):
-    if role == 'Student':
-        return 'stud' + generate_random_number()
-    elif role == 'Parent':
-        return 'par' + generate_random_number()
-    elif role == 'Teacher':
-        return 'tch' + generate_random_number()
+    user_code = {
+        'Student':('std',),
+        'Parent':('prt',),
+        'Teacher':('tch', TeacherAccount.objects.latest('id')+1)}
+    return user_code[role][0] + '/' + user_code[role][1]
 
- 
+
 def hash_password(ppt):
     bppt = ppt.encode()
     pct = hashlib.pbkdf2_hmac("sha256", bppt, b"m@ssa", 10000)
