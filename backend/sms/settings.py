@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os 
 from dotenv import load_dotenv
+from datetime import date
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -47,7 +49,7 @@ INSTALLED_APPS = [
 # third party app
 INSTALLED_APPS += [
     "users",
-    
+    "account"
 ]
 
 
@@ -155,3 +157,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+
+TERM_START_DATE = date(2023, 1, 29)

@@ -7,6 +7,7 @@ from django.db import models, transaction, IntegrityError
 from django.db.models import Count, Prefetch, Sum, Q, F
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.conf import settings
 
 # from .users.model_mixins import ModelMixin
 
@@ -47,8 +48,6 @@ class Permission(models.Model):
     def get_permissions(cls):
         permissions = cls.objects.all().values()
         return list(permissions)
-
-
 
 
 class SchoolUser(models.Model):
@@ -121,3 +120,14 @@ class SchoolUser(models.Model):
         except cls.DoesNotExist:
             parent = None
         return parent
+
+
+class Attendance(models.Model):
+    user = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
+    attendance = models.CharField(max_length=150)
+    
+    def get_dates_absent(self):
+        term_start = settings.TERM_START_DATE
+        att = self.attendance
+        return [term_start + timedelta(days=i) for i, at in enumerate(list(att)) if at == '0']
+

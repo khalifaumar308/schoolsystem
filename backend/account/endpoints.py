@@ -6,6 +6,8 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 # from .functions import send_mail 
 from django.http import JsonResponse
+from .models import SchoolUser, Attendance
+from .serializers import AttendanceSerializer
 
 
 class AddUser(APIView):
@@ -20,3 +22,14 @@ class AddUser(APIView):
         if new_user:
             return Response({"success":True}, status=status.HTTP_201_CREATED)
         return Response({"success":False}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Attendance(APIView):
+    serializer_class = AttendanceSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.save_attendance(request.data)
+        return Response({"success":True}, status=status.HTTP_201_CREATED)
+        
+

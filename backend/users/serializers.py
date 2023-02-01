@@ -92,6 +92,8 @@ class OtherUserSerializer(serializers.ModelSerializer):
         print("###############OTHER USER")
         print(other_user, pin, username)
         return other_user
+    
+    
 class TeacherAccountSerializer(serializers.ModelSerializer):
     # username = serializers.CharField()
     # country = serializers.CharField()

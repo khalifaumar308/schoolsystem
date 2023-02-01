@@ -6,6 +6,7 @@ import smtplib
 import random
 from django.utils.crypto import get_random_string
 from .models import *
+from django.conf import settings
 
 
 def generate_username(role):

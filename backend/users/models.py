@@ -9,7 +9,7 @@ from .utils import hash_password
 
 class CustomUserManager(BaseUserManager):
 
-    def create_user(self,email,  username, first_name=None, last_name=None, password=None, **other_fields):
+    def create_user(self, email,  username, first_name=None, last_name=None, password=None, **other_fields):
         if not username:
             raise ValueError('Users must have an username')
         
@@ -34,8 +34,6 @@ class CustomUserManager(BaseUserManager):
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
         other_fields.setdefault('is_active', True)
-        # other_fields.setdefault('first_name', None)
-        # other_fields.setdefault('last_name', None)
 
         if other_fields.get('is_staff') is not True:
             raise ValueError(
@@ -105,9 +103,6 @@ class OtherUser(models.Model):
                 other_user = cls.objects.create(**kwargs)
                 if roles == "Teacher":
                     teacher = TeacherAccount.create_account(
-                        # first_name=kwargs["first_name"],
-                        # last_name=kwargs["last_name"],
-                        # middle_name=kwargs["middle_name"],
                         username=username,
                         state=kwargs["state"],
                         country=kwargs["country"],
@@ -124,20 +119,13 @@ class OtherUser(models.Model):
 
 
 class TeacherAccount(models.Model):
-    # first_name = models.CharField(max_length=200)
-    # middle_name = models.CharField(max_length=200)
-    # last_name = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
     state = models.CharField(max_length=200)
     username = models.CharField(max_length=200, unique=True)
     other_user = models.ForeignKey('OtherUser',related_name="teacher_user", on_delete=models.CASCADE)
-    # email = models.EmailField(max_length=255, null=True)
 
     @classmethod
     def create_account(cls, **kwargs):
-        # print('inside model')
-        # print('===============MODEL========')
-        # print(kwargs)
         with transaction.atomic():
             try:
                 teacheraccount = cls(
@@ -210,6 +198,7 @@ class TeacherAccount(models.Model):
 
     def __str__(self):
         return f'{self.username}-{self.state}'
+
 
 class ProfileLogin(models.Model):
     username = models.CharField(max_length=200, unique=True)
