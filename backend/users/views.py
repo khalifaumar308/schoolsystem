@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .functions import send_mail 
+from django.http import JsonResponse
 
 
 # class AddTeacherAPIView(APIView):
@@ -120,7 +121,9 @@ class TeacherAccountUpdateAPIView(APIView):
         serializer = TeacherAccountSerializer(teacher_account, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            print('ISVALID', serializer.data)
+            return Response({"data":serializer.data, "status":True}, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class TeacherRetrieveAPIView(APIView):
@@ -145,10 +148,20 @@ class TeacherRetrieveAPIView(APIView):
 
 class TeacherDeleteAPIView(APIView):
     def get(self, request, username):
-        print('higugifu')
+        # print('higugifu')
         delete_teacher = TeacherAccount.delete_teacher(username=username)
-        print('hiieirhe', delete_teacher)
+        # print('hiieirhe', delete_teacher)
         if delete_teacher:
             return Response({"success":"Teacher Account delete successfully"}, status=204)
         
         return Response({"failed":"Teacher can not be deleted"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetTeachers(APIView):
+    def get(self, request):
+        teacher = TeacherAccount.get_teachers()
+        # print(teacher)
+        return Response(data=teacher,status=status.HTTP_200_OK)
+        # return  JsonResponse(data= [], safe=False)
+
+

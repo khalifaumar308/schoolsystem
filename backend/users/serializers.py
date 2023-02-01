@@ -55,7 +55,7 @@ class OtherUserSerializer(serializers.ModelSerializer):
 
     @classmethod
     def create(cls, validated_data):
-        print("🚀 ~ file: serializers.py:15 ~ validated_data", validated_data)
+        # print("🚀 ~ file: serializers.py:15 ~ validated_data", validated_data)
         country = validated_data.pop('country')
         state = validated_data.pop('state')
 
@@ -84,13 +84,6 @@ class OtherUserSerializer(serializers.ModelSerializer):
                     other_user = other_user
 
                 )
-                print('USERNAME AND PIN')
-                print(username, pin)
-
-        print("***********VALIDATED DATA")
-        print(validated_data)
-        print("###############OTHER USER")
-        print(other_user, pin, username)
         return other_user
     
     
@@ -98,33 +91,36 @@ class TeacherAccountSerializer(serializers.ModelSerializer):
     # username = serializers.CharField()
     # country = serializers.CharField()
     # state = serializers.CharField()
+    # first_name = serializers.SerializerMethodField()
+    # last_name = serializers.SerializerMethodField()
+    first_name = serializers.CharField(source='other_user.first_name')
+    last_name = serializers.CharField(source='other_user.last_name')
     class Meta:
         model = TeacherAccount
-        fields = ('id', 'country', 'state', 'username', 'other_user')
-        read_only_fields = ('other_user','id')
+        fields = ('id', 'country', 'state', 'username', 'other_user', 'first_name', 'last_name')
+        read_only_fields = ('id', 'username')
+    
+    # def get_first_name(self, obj):
+    #         return obj.other_user.first_name
+    
+    # def get_last_name(self, obj):
+    #     return obj.other_user.last_name
     
 
     def update(self, instance, validated_data):
-        print("🚀 ~ file: serializers.py:47 ~ validated_data", validated_data)
-        print("🚀 ~ file: serializers.py:47 ~ instance", instance)
+        # print("🚀 ~ file: serializers.py:47 ~ validated_data", validated_data)
+        # print("🚀 ~ file: serializers.py:47 ~ instance", instance)
         # Load the state and country fields with the saved data
+        
         instance.state = validated_data.get('state', instance.state)
         instance.country = validated_data.get('country', instance.country)
-        # Update the other fields
-        # instance.username = validated_data.get('username', instance.username)
-        # instance.other_user = validated_data.get('other_user', instance.other_user)
+        # instance.other_user.first_name = validated_data.get('first_name', instance.other_user.first_name)
+        # instance.other_user.last_name = validated_data.get('last_name', instance.other_user.last_name)
+        # instance.other_user.save()
+        # print('AFTER', validated_data)
+        # print(instance)
         # Save the changes
         instance.save()
         return instance
 
-    # def create(self, validated_data):
-    #     # generate unique username for the teacher
-    #     username = generate_username('teacher')
-
-    #     new_teacher = TeacherAccount.create_account(
-    #         username=username,
-    #         country=validated_data['country'],
-    #         state=validated_data['state'],
-    #     )
-
-    #     return new_teacher
+   

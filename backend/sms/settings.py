@@ -23,7 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-yhm07)jy9wvrx7!eh@-sxe%wwe_3#4nck$*4$u!_)olf90$(=u'
 load_dotenv(os.path.join(BASE_DIR, "sms/.env"))
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -49,11 +48,13 @@ INSTALLED_APPS = [
 # third party app
 INSTALLED_APPS += [
     "users",
-    "account"
+    "account",
+    
 ]
 
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +63,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+APPEND_SLASH=False
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'sms.urls'
 
@@ -145,7 +155,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.NewUser'
+# AUTH_USER_MODEL = 'users.NewUser'
 
 
 # EMAIL
@@ -159,3 +169,14 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 
 TERM_START_DATE = date(2023, 1, 29)
+
+# if report:
+#             generated = Report.create_report(name=name, data=filtered)
+#             report_data = {
+#                 "sn": 1,
+#                 "name": generated.name,
+#                 "data": json.loads(generated.data),
+#                 "date": generated.created_at,
+#                 "status": 1,
+#             }
+#             data = {"status": True, "data": report_data}
