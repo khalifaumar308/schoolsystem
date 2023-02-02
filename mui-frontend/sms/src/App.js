@@ -10,6 +10,7 @@ import ListTeachers from "scenes/teachers";
 import ListStudents from "scenes/students";
 // import AddTeacher from "scenes/teachers/add-teacher";
 import AddUser from "scenes/users/add-user";
+import AddClass from "scenes/classes/add-class";
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -26,6 +27,7 @@ function App() {
               <Route path="/list-teachers" element={<ListTeachers />} />
               <Route path="/list-students" element={<ListStudents />} />
               <Route path="/add-user" element={<AddUser />} />
+              <Route path="/add-class" element={<AddClass />} />
               <Route path="/breakdown" element={"Break"} />
 
             </Route>

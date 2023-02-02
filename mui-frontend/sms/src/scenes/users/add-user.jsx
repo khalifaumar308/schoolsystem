@@ -9,6 +9,7 @@ import Header from "scenes/components/Header";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
 import { useAddUserMutation } from "state/api";
+import { useGetClassesQuery } from "state/api";
 import { useGetParentsQuery } from "state/api";
 
 const ROLES = [
@@ -197,12 +198,16 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [gender, setGender] = useState("");
   const [parent, setParent] = useState("");
+  const [classId, setClassId] = useState("");
   const [loadingBtn, setLoadingBtn] = useState(false);
+  const classList  = useGetClassesQuery();
+  const classData = classList ? classList.data : [];
   // const [country, setCountry] = useState("");
   // const [state, setState] = useState("");
   // const [firstName, setFirstName] = useState("")
   const [addUser, response] = useAddUserMutation();
   const { data, isloading } = useGetParentsQuery();
+//   console.log("🚀 ~ file: class.jsx:209 ~ AddUser ~ classes", classes)
   console.log("🚀 ~ file: parents-teacher.jsx:207 ~ AddTeacher ~ data", data);
   console.log("00000000000000");
   console.log(parent, "parent");
@@ -228,6 +233,7 @@ export default function AddUser() {
     formData.append("gender", gender);
     formData.append("roles", role);
     formData.append("parent_id", parent);
+    formData.append("class_id", classId);
     console.log(
       "🚀 ~ file: add-teacher.jsx:198 ~ submitForm ~ formData",
       formData.get("email")
@@ -359,6 +365,27 @@ export default function AddUser() {
                       <MenuItem key={item.id} value={item.id}>
                         {item.school_user__first_name}{" "}
                         {item.school_user__last_name}
+                      </MenuItem>
+                    ))}
+                </TextField>
+                <TextField
+                  // required
+                  id="filled-required"
+                  label="Class"
+                  defaultValue=""
+                  variant="filled"
+                  select
+                  sx={{
+                    gridColumn: "span 2",
+                    width: "60%",
+                  }}
+                  value={classId}
+                  onChange={(e) => setClassId(e.target.value)}
+                >
+                  {classData &&
+                    classData.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
                       </MenuItem>
                     ))}
                 </TextField>

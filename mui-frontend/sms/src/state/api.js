@@ -18,6 +18,10 @@ export const api = createApi({
             query: () => "/account/list_parents",
             providesTags: ["User"]
         }), 
+        getClasses:build.query({
+            query: () => "/account/list_classes",
+            providesTags: ["User"]
+        }), 
         // Parents Getter
         totalTeacher:build.query({
             query : () => "/account/total_teacher",
@@ -26,6 +30,17 @@ export const api = createApi({
         addUser : build.mutation({
             query : (payload) => ({
                 url : '/account/register_user',
+                method : 'POST',
+                body : payload,
+                // headers: {
+                //     'Content-type' : 'application/json; charset=UTF-8'
+                // },
+            }),
+            invalidatesTags: ["User"]
+        }),
+        addClass : build.mutation({
+            query : (payload) => ({
+                url : '/account/add_class',
                 method : 'POST',
                 body : payload,
                 // headers: {
@@ -52,8 +67,10 @@ export const {
     useTotalTeacherQuery,
     useGetParentsQuery,
     useGetStudentsQuery,
+    useGetClassesQuery,
 
     useAddUserMutation,
     useUpdateTeacherMutation,
+    useAddClassMutation,
     
 } = api 

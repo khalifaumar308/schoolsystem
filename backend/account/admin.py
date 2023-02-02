@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import SchoolUser, Attendance
 from .models import SchoolUser, Profile, ProfileLogin
+from .models import SchoolUser, Profile, ProfileLogin, Class
 from django.forms import TextInput, Textarea
 from django.contrib.auth.admin import UserAdmin
 
@@ -18,5 +19,6 @@ class AttendanceAdmin(admin.ModelAdmin):
     # list_filter = ('email', )
     list_display = ( 'user', 'attendance')
 
-admin.site.register([ProfileLogin, Profile])
+# admin.site.register([ProfileLogin, Profile])
+admin.site.register([ProfileLogin, Profile, Class])
 # admin.site.register

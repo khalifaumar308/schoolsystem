@@ -33,6 +33,7 @@ import {
   ExpandMore,
   ExpandLess,
   PlusOneOutlined,
+  ClassOutlined,
 } from "@mui/icons-material";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -113,6 +114,10 @@ const navItems = [
   {
     text: "Add-User",
     icon: <PlusOneOutlined />,
+  },
+  {
+    text: "Add-Class",
+    icon: <ClassOutlined />,
   },
   
 ];
