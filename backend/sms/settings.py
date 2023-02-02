@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os 
 from dotenv import load_dotenv
+import cloudinary
+# import cloudinary.uploader
+# import cloudinary.api
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS += [
     "users",
     "account",
+    'cloudinary',
     
 ]
 
@@ -155,6 +161,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # AUTH_USER_MODEL = 'users.NewUser'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # EMAIL
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -177,3 +185,10 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 #                 "status": 1,
 #             }
 #             data = {"status": True, "data": report_data}
+
+
+cloudinary.config( 
+  cloud_name = "dr7horthg", 
+  api_key = "373118866994752", 
+  api_secret = "j6vH5WtMF0_wQgSGzqikX-HOLxs" 
+)

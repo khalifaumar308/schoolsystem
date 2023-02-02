@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SchoolUser, Profile, ProfileLogin
+from .models import SchoolUser, Profile, ProfileLogin, Class
 from django.forms import TextInput, Textarea
 from django.contrib.auth.admin import UserAdmin
 
@@ -11,5 +11,5 @@ class AddUserAdmin(admin.ModelAdmin):
     # list_filter = ('email', )
     list_display = ( 'first_name', 'last_name')
 
-admin.site.register([ProfileLogin, Profile])
+admin.site.register([ProfileLogin, Profile, Class])
 # admin.site.register

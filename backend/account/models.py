@@ -7,7 +7,7 @@ from django.db import models, transaction, IntegrityError
 from django.db.models import Count, Prefetch, Sum, Q, F
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-
+from cloudinary.models import CloudinaryField
 # from .users.model_mixins import ModelMixin
 
 from .utils import hash_password
@@ -55,6 +55,44 @@ class Permission(models.Model):
         return list(permissions)
 
 
+class Class(models.Model):
+    name = models.CharField(max_length=200)
+    section = models.CharField(max_length=200)
+    teacher = models.ForeignKey('SchoolUser', on_delete=models.CASCADE, related_name="teacher_class", null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+    
+    @classmethod
+    def create_class(cls, **kwargs):
+        teacher_id = kwargs.get("teacher_id")
+        if teacher_id:
+            teacher = SchoolUser.objects.get(id=teacher_id)
+            # print("🚀 ~ file: models.py:74 ~ teacher", teacher)
+            if teacher:
+                classes = cls.objects.create(teacher=teacher, **kwargs)
+            return classes
+        return None
+    
+    @classmethod
+    def get_classes(cls):
+        query = None
+        fields = [
+            "id",
+            "name",
+            # "teacher__first_name",
+            # "teacher__last_name",
+            # "school_user__middle_name",
+            # "school_user__email",
+            "section",
+            # "state",
+            # "country"
+        ]
+        query = cls.objects.all().values(*fields)
+        return list(query)
 
 
 class SchoolUser(models.Model):
@@ -83,6 +121,8 @@ class SchoolUser(models.Model):
         blank=True, 
         null=True,
     )
+    class_enrolled = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='students', blank=True, 
+        null=True,)
     date = models.DateTimeField(default=timezone.now, blank=True)
 
     objects = models.Manager()
@@ -100,9 +140,12 @@ class SchoolUser(models.Model):
             try:
                 pin = kwargs.pop("pin")
                 username = kwargs.pop("username")
+                image = kwargs.pop("image", None)
                 parent = None 
                 parent_id = kwargs.pop("parent_id", None)
+                class_id = kwargs.pop("class_id", None)
                 roles = kwargs.get("roles")
+                class_enrolled=None
 
                 if parent_id:
                     parent = cls.get_parent(id=parent_id, obj=True)
@@ -111,12 +154,21 @@ class SchoolUser(models.Model):
                     kwargs.update(
                         parent=parent,
                     )
+
+                if class_id:
+                    class_enrolled = cls.get_class(id=class_id, obj=True)
+
+                if class_id and roles == "Student":
+                    kwargs.update(
+                        class_enrolled=class_enrolled
+                    )
                 user = cls.objects.create(**kwargs)
                 account = Profile.create_profile(
                     username=username,
                     pin=pin,
                     school_user=user,
-                    roles=roles
+                    roles=roles,
+                    image=image
                 )
                 if account:
                     return user 
@@ -135,6 +187,18 @@ class SchoolUser(models.Model):
             parent = None
         return parent
     
+    @classmethod
+    def get_class(cls, **kwargs):
+        obj = kwargs.pop("obj", None)
+        try:
+            if obj:
+                class_id = Class.objects.get(**kwargs)
+            else:
+                class_id = Class.objects.get(**kwargs).values()
+        except cls.DoesNotExist:
+            class_id = None
+        return class_id
+    
 
 class Profile(ModelMixin):
     # TODO : add model mixins later to get created at
@@ -143,14 +207,15 @@ class Profile(ModelMixin):
     username = models.CharField(max_length=200, unique=True)
     school_user = models.ForeignKey('SchoolUser',related_name="teacher_user", on_delete=models.CASCADE)
     added_date = models.DateTimeField(default=timezone.now)
-    image = models.ImageField(upload_to='user_images/', blank=True, null=True)
+    # image = models.ImageField(upload_to='user_images/', blank=True, null=True)
+    image = CloudinaryField(blank=True, null=True)
     permissions = models.JSONField(default=permission_default, blank=True)
     session_id = models.CharField(max_length=255, null=True, blank=True)
     roles = models.CharField(max_length=200, default='Staff', blank=True, null=True)
     def image_url(self):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
-            
+             
     @classmethod
     def create_profile(cls, **kwargs):
         with transaction.atomic():
@@ -160,6 +225,7 @@ class Profile(ModelMixin):
                     school_user =kwargs["school_user"],
                     # country=kwargs["country"],
                     username=kwargs["username"],
+                    image=kwargs["image"],
                     # state=kwargs["state"]
                    
                 )
@@ -244,6 +310,7 @@ class Profile(ModelMixin):
         query = cls.objects.filter(school_user__roles="Parent").values(*fields)
         return list(query)
     
+    
     @classmethod
     def get_students(cls):
         query = None
@@ -287,3 +354,20 @@ class ProfileLogin(models.Model):
         kwargs["pin"] = hash_password(kwargs["pin"])
         cls(**kwargs).save()
     
+
+class Subject(models.Model):
+    name = models.CharField(max_length=200)
+    teacher = models.ForeignKey(SchoolUser, on_delete=models.SET_NULL, null=True, blank=True)
+    class_name = models.ForeignKey(Class, on_delete=models.CASCADE)
+
+class Grade(models.Model):
+    student = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    score = models.PositiveIntegerField()
+
+class Attendance(models.Model):
+    student = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    date = models.DateField()
+    present = models.BooleanField(default=False)
