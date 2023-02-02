@@ -2,6 +2,7 @@ from django.urls import path
 from .endpoints import *
 
 urlpatterns = [
+    path('attendance/', Attendance.as_view()),
     path("register_user", AddUser.as_view()),
     path("add_class", AddClass.as_view()),
     path("list_teachers", GetTeachers.as_view()),

@@ -8,6 +8,8 @@ from django.db.models import Count, Prefetch, Sum, Q, F
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from cloudinary.models import CloudinaryField
+from django.conf import settings
+
 # from .users.model_mixins import ModelMixin
 
 from .utils import hash_password
@@ -365,9 +367,20 @@ class Grade(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     score = models.PositiveIntegerField()
 
+# class Attendance(models.Model):
+#     student = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
+#     class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
+#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+#     date = models.DateField()
+#     present = models.BooleanField(default=False)
+
 class Attendance(models.Model):
-    student = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
-    class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    date = models.DateField()
-    present = models.BooleanField(default=False)
+    user = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
+    attendance = models.CharField(max_length=150)
+    
+    def get_dates_absent(self):
+        term_start = settings.TERM_START_DATE
+        att = self.attendance
+        return [term_start + timedelta(days=i) for i, at in enumerate(list(att)) if at == '0']
+
+    

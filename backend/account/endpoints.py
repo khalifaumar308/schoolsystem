@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from .utils import generate_username, get_otp_html_message, send_mailer
 from django.utils.crypto import get_random_string 
 from .forms import AddClassForm, AddUserForm
+from .serializers import AttendanceSerializer
+
 # import cloudinary
 
 
@@ -20,7 +22,7 @@ class AddUser(APIView):
         if form.is_valid():
             pin = get_random_string(length=6, allowed_chars="1234567890") 
             roles = form.cleaned_data.get("roles")
-            username = generate_username(roles)
+            username = generate_username(roles, SchoolUser.objects.last().id+1)
             # image = request.FILES['image']
             # result = cloudinary.uploader.upload(image)
             # form.cleaned_data['image'] = result['url']
@@ -105,3 +107,12 @@ class GetTeacherStats(APIView):
     def get(self, request):
         stats = Profile.get_teacher_stat()
         return Response(data=stats, status=status.HTTP_200_OK)
+
+
+class Attendance(APIView):
+    serializer_class = AttendanceSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.save_attendance(request.data)
+        return Response({"success":True}, status=status.HTTP_201_CREATED)

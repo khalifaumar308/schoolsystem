@@ -14,6 +14,7 @@ from pathlib import Path
 import os 
 from dotenv import load_dotenv
 import cloudinary
+from datetime import date
 # import cloudinary.uploader
 # import cloudinary.api
 
@@ -174,6 +175,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 
+TERM_START_DATE = date(2023, 1, 29)
 
 # if report:
 #             generated = Report.create_report(name=name, data=filtered)

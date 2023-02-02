@@ -29,15 +29,18 @@ def generate_random_number():
     return str(random.randint(1000, 9999))
 
 
-def generate_username(role):
-    title = None
-    if role == 'Student':
-        title =  'stud' + generate_random_number()
-    elif role == 'Parent':
-        title =  'par' + generate_random_number()
-    elif role == 'Teacher':
-        title =  'tch' + generate_random_number()
-    return title 
+def generate_username(role, code):
+    roles_dict = {'Teacher':'tch', 'Student':'std', 'Parent':'prt'}
+    return roles_dict[role] + str(code)
+    # code = SchoolUser.objects.latest().id +1
+    # title = None
+    # if role == 'Student':
+    #     title =  'stud' + generate_random_number()
+    # elif role == 'Parent':
+    #     title =  'par' + generate_random_number()
+    # elif role == 'Teacher':
+    #     title =  'tch' + generate_random_number()
+    # return title 
 
 def hash_password(ppt):
     bppt = ppt.encode()
