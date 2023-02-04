@@ -15,6 +15,7 @@ from django.conf import settings
 from .utils import hash_password
 
 # Create your models here.
+term_start = settings.TERM_START_DATE
 
 def permission_default():
     return ['staff']
@@ -377,10 +378,14 @@ class Grade(models.Model):
 class Attendance(models.Model):
     user = models.ForeignKey(SchoolUser, on_delete=models.CASCADE)
     attendance = models.CharField(max_length=150)
-    
-    def get_dates_absent(self):
-        term_start = settings.TERM_START_DATE
-        att = self.attendance
-        return [term_start + timedelta(days=i) for i, at in enumerate(list(att)) if at == '0']
+    objects = models.Manager
 
-    
+    def get_dates_absent(self):
+        att = self.attendance
+        return [str(term_start + timedelta(days=i)) for i, at in enumerate(list(att)) if at == '0']
+
+    @classmethod
+    def get_days_absent(cls, class_name):
+        students = cls.objects.filter(user__class_enrolled__name=class_name)
+        return {student.user_id:student.get_dates_absent() for student in list(students)}
+

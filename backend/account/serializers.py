@@ -29,8 +29,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
                 user.attendance = att + str(user_attendance.attendance)
                 user.save()
             except:
-                print(first_att, 123456789)
                 attendance = first_att + str(user_attendance["attendance"])
                 user = SchoolUser.objects.get(id=user_attendance["id"])
                 Attendance(user=user, attendance=attendance).save()
         return 'Done'
+    
