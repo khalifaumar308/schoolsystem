@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Attendance, SchoolUser
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.conf import settings
 from django.db import transaction
 
@@ -34,3 +34,14 @@ class AttendanceSerializer(serializers.ModelSerializer):
                 Attendance(user=user, attendance=attendance).save()
         return 'Done'
     
+    @classmethod
+    def get_data(cls, params):
+        class_name, user_id, date = params.get('class_name'), params.get('user_id'), params.get('date')
+        if date:
+            date = datetime.strptime(date, '%y/%m/%d').date()
+            data = Attendance.get_attendance_by_day(date, class_name)
+        elif user_id:
+            data = Attendance.get_dates_absent(user_id)
+        else:
+            data = Attendance.get_days_absent(class_name)
+        return data

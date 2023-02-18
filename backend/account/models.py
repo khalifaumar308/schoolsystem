@@ -4,11 +4,12 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models, transaction, IntegrityError 
-from django.db.models import Count, Prefetch, Sum, Q, F
+from django.db.models import Count, Prefetch, Sum, Q, F, Value
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from cloudinary.models import CloudinaryField
 from django.conf import settings
+from django.db.models.functions import Concat
 
 # from .users.model_mixins import ModelMixin
 
@@ -181,6 +182,7 @@ class SchoolUser(models.Model):
     @classmethod
     def get_parent(cls, **kwargs):
         obj = kwargs.pop("obj", None)
+        # cls.objects.update(attendance=F('attendance')+'?')
         try:
             if obj:
                 parent = cls.objects.get(**kwargs)
@@ -381,11 +383,25 @@ class Attendance(models.Model):
     objects = models.Manager
 
     def get_dates_absent(self):
+        """"""
         att = self.attendance
-        return [str(term_start + timedelta(days=i)) for i, at in enumerate(list(att)) if at == '0']
+        return [str(term_start + timedelta(days=i)) for i, at in enumerate(att) if at == '0']
 
     @classmethod
-    def get_days_absent(cls, class_name):
-        students = cls.objects.filter(user__class_enrolled__name=class_name)
+    def get_days_absent(cls, class_name=None):
+        """"""
+        students = cls.objects.filter(user__class_enrolled__name=class_name) if class_name else \
+                    cls.objects.all()
         return {student.user_id:student.get_dates_absent() for student in list(students)}
 
+    @classmethod
+    def get_attendance_by_day(cls, date, class_name=None):
+        """"""
+        days_diff = (date - term_start).days
+        class_members = cls.objects.filter(user__class_enrolled__name=class_name) if class_name else \
+                    cls.objects.all()
+        return {member.user_id:member.attendance[days_diff] for member in class_members}
+
+    @classmethod
+    def update_attendance(cls):
+        cls.objects.update(attendance=Concat('attendance', Value('?')))

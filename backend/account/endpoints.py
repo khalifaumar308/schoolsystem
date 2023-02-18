@@ -1,4 +1,5 @@
-from .models import Class, Profile, SchoolUser
+from .models import Class, Profile, SchoolUser, Attendance
+from datetime import datetime
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -109,10 +110,16 @@ class GetTeacherStats(APIView):
         return Response(data=stats, status=status.HTTP_200_OK)
 
 
-class Attendance(APIView):
+class Attendance_api(APIView):
     serializer_class = AttendanceSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.save_attendance(request.data)
         return Response({"success":True}, status=status.HTTP_201_CREATED)
+
+    def get(self, request):
+        params = request.GET
+        serializer = self.serializer_class()
+        data = serializer.get_data(params)
+        return Response(data=data, status=status.HTTP_200_OK)
